@@ -3,192 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI智能助手 - 杨泓</title>
+    <title>AI前沿对话项目 | 杨泓</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        body {
-            background: #f7f8fc;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 8px;
-        }
-
-        .header .author {
-            font-size: 15px;
-            opacity: 0.95;
-        }
-
-        .chat-box {
-            height: 550px;
-            padding: 24px;
-            overflow-y: auto;
-            background: #fdfdfd;
-        }
-
-        .message {
-            margin-bottom: 20px;
-            display: flex;
-        }
-
-        .user {
-            justify-content: flex-end;
-        }
-
-        .bot {
-            justify-content: flex-start;
-        }
-
-        .bubble {
-            max-width: 75%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .user .bubble {
-            background: #4f46e5;
-            color: white;
-        }
-
-        .bot .bubble {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-
-        .input-area {
-            display: flex;
-            padding: 16px 24px;
-            gap: 12px;
-            border-top: 1px solid #eee;
-        }
-
-        #input {
-            flex: 1;
-            padding: 14px 18px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        #send {
-            padding: 14px 24px;
-            background: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 24px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        #send:hover {
-            background: #4338ca;
-        }
-
-        .loading {
-            color: #666;
-            font-style: italic;
-        }
+        * {margin: 0;padding: 0;box-sizing: border-box;}
+        body {background: #1a1a2e;color: #eee;font-family: "微软雅黑",sans-serif;}
+        .container {max-width: 850px;margin: 30px auto;background: #16213e;border-radius: 16px;overflow: hidden;}
+        .top {padding: 20px;text-align: center;background: #0f3460;}
+        .top h1 {font-size: 24px;margin-bottom: 6px;}
+        .top p {color: #a8dadc;}
+        .chat {height: 500px;padding: 20px;overflow-y: auto;}
+        .user {text-align: right;margin: 15px 0;}
+        .ai {text-align: left;margin: 15px 0;}
+        .u-box {display: inline-block;background: #0092ca;padding: 10px 16px;border-radius: 15px 15px 2px 15px;max-width: 75%;}
+        .a-box {display: inline-block;background: #224268;padding: 10px 16px;border-radius: 15px 15px 15px 2px;max-width: 75%;}
+        .input-area {display: flex;padding: 15px;background: #0f3460;gap: 10px;}
+        #msg {flex: 1;padding: 12px;border-radius: 20px;border: none;outline: none;}
+        #send {width: 80px;border-radius: 20px;border: none;background: #0092ca;color: #fff;cursor: pointer;}
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌐 AI 智能对话助手</h1>
-            <p class="author">开发者：杨泓 | 基于通义千问大模型</p>
-        </div>
-
-        <div class="chat-box" id="chat"></div>
-
-        <div class="input-area">
-            <input id="input" placeholder="请输入你的问题..." autocomplete="off">
-            <button id="send">发送</button>
-        </div>
+<div class="container">
+    <div class="top">
+        <h1>AI大模型智能对话系统</h1>
+        <p>开发者：杨泓 | 前沿AI开源模型 · GitHub部署</p>
     </div>
+    <div class="chat" id="chatBox"></div>
+    <div class="input-area">
+        <input type="text" id="msg" placeholder="输入内容，发送给AI...">
+        <button id="send" onclick="chatAI()">发送</button>
+    </div>
+</div>
 
-    <script>
-        const API_KEY = "sk-2d65424d380742179c5a8e5571f72123"; // 免费公开KEY
-        const chat = document.getElementById("chat");
-        const input = document.getElementById("input");
-        const send = document.getElementById("send");
+<script>
+// 免费稳定可跨域 AI接口 真实响应
+async function chatAI(){
+    let text = document.getElementById('msg').value.trim();
+    if(!text) return;
 
-        function addMsg(text, isUser = false) {
-            const div = document.createElement("div");
-            div.className = isUser ? "message user" : "message bot";
-            div.innerHTML = `<div class="bubble">${text}</div>`;
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
+    // 用户消息
+    chatBox.innerHTML += `<div class="user"><div class="u-box">${text}</div></div>`;
+    document.getElementById('msg').value = '';
 
-        async function sendMsg() {
-            const text = input.value.trim();
-            if (!text) return;
-            addMsg(text, true);
-            input.value = "";
+    // 加载提示
+    let load = `<div class="ai"><div class="a-box">AI正在生成回答...</div></div>`;
+    chatBox.innerHTML += load;
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-            const loading = document.createElement("div");
-            loading.className = "message bot";
-            loading.innerHTML = `<div class="bubble loading">思考中...</div>`;
-            chat.appendChild(loading);
+    // 真实AI请求
+    let res = await fetch("https://free.v36.cm/v1/chat/completions",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            model:"gpt-3.5-turbo",
+            messages:[{"role":"user","content":text}],
+            temperature:0.6
+        })
+    });
 
-            try {
-                const res = await fetch("https://chatapi.akide.top/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "qwen-turbo",
-                        messages: [{ role: "user", content: text }],
-                        temperature: 0.7
-                    })
-                });
-
-                const data = await res.json();
-                chat.removeChild(loading);
-                addMsg(data.choices[0].message.content);
-            } catch (err) {
-                chat.removeChild(loading);
-                addMsg("AI 服务暂时不可用，请稍后再试~");
-            }
-        }
-
-        send.onclick = sendMsg;
-        input.onkeydown = e => e.key === "Enter" && sendMsg();
-
-        window.onload = () => {
-            addMsg("你好杨泓！我是你的AI智能助手，有什么可以帮你？");
-        };
-    </script>
+    let data = await res.json();
+    // 删掉加载
+    chatBox.removeChild(chatBox.lastElementChild);
+    // AI回复
+    let ans = data.choices[0].message.content;
+    chatBox.innerHTML += `<div class="ai"><div class="a-box">${ans}</div></div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
 </body>
 </html>
