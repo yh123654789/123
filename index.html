@@ -3,71 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI前沿对话项目 | 杨泓</title>
+    <title>AI 智能助手 - 杨泓</title>
+    <!-- 引入 Tailwind CSS 用于美观的样式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        * {margin: 0;padding: 0;box-sizing: border-box;}
-        body {background: #1a1a2e;color: #eee;font-family: "微软雅黑",sans-serif;}
-        .container {max-width: 850px;margin: 30px auto;background: #16213e;border-radius: 16px;overflow: hidden;}
-        .top {padding: 20px;text-align: center;background: #0f3460;}
-        .top h1 {font-size: 24px;margin-bottom: 6px;}
-        .top p {color: #a8dadc;}
-        .chat {height: 500px;padding: 20px;overflow-y: auto;}
-        .user {text-align: right;margin: 15px 0;}
-        .ai {text-align: left;margin: 15px 0;}
-        .u-box {display: inline-block;background: #0092ca;padding: 10px 16px;border-radius: 15px 15px 2px 15px;max-width: 75%;}
-        .a-box {display: inline-block;background: #224268;padding: 10px 16px;border-radius: 15px 15px 15px 2px;max-width: 75%;}
-        .input-area {display: flex;padding: 15px;background: #0f3460;gap: 10px;}
-        #msg {flex: 1;padding: 12px;border-radius: 20px;border: none;outline: none;}
-        #send {width: 80px;border-radius: 20px;border: none;background: #0092ca;color: #fff;cursor: pointer;}
+        /* 简单的打字机光标动画 */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="top">
-        <h1>AI大模型智能对话系统</h1>
-        <p>开发者：杨泓 | 前沿AI开源模型 · GitHub部署</p>
+<body class="bg-gray-900 text-white h-screen flex flex-col">
+    <div id="app" class="h-full flex flex-col max-w-4xl mx-auto w-full">
+        
+        <!-- 顶部导航栏：显示姓名和学号 -->
+        <header class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800 rounded-b-xl shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-xl">🤖</div>
+                <div>
+                    <h1 class="font-bold text-lg">AI 智能对话助手</h1>
+                    <p class="text-xs text-gray-400">基于前沿大语言模型接口</p>
+                </div>
+            </div>
+            <!-- 你的个人信息展示 -->
+            <div class="text-right">
+                <p class="text-sm font-semibold text-blue-400">姓名：杨泓</p>
+                <p class="text-xs text-gray-400">学号：423240639</p>
+            </div>
+        </header>
+
+        <!-- 聊天内容展示区 -->
+        <main class="flex-1 overflow-y-auto p-4 space-y-4" ref="chatContainer">
+            <div v-for="(msg, index) in messages" :key="index" 
+                 :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start']">
+                <div :class="['max-w-[80%] p-3 rounded-xl text-sm', 
+                             msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200']">
+                    <p :class="{'typing-cursor': msg.isTyping}">{{ msg.content }}</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部输入框 -->
+        <footer class="p-4 bg-gray-800 rounded-t-xl">
+            <div class="flex gap-2">
+                <input v-model="inputMessage" @keyup.enter="sendMessage"
+                       type="text" placeholder="输入你想问 AI 的问题..." 
+                       class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button @click="sendMessage" :disabled="isLoading"
+                        class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 px-6 py-3 rounded-lg font-medium transition">
+                    {{ isLoading ? '思考中...' : '发送' }}
+                </button>
+            </div>
+        </footer>
+
     </div>
-    <div class="chat" id="chatBox"></div>
-    <div class="input-area">
-        <input type="text" id="msg" placeholder="输入内容，发送给AI...">
-        <button id="send" onclick="chatAI()">发送</button>
-    </div>
-</div>
 
-<script>
-// 免费稳定可跨域 AI接口 真实响应
-async function chatAI(){
-    let text = document.getElementById('msg').value.trim();
-    if(!text) return;
-
-    // 用户消息
-    chatBox.innerHTML += `<div class="user"><div class="u-box">${text}</div></div>`;
-    document.getElementById('msg').value = '';
-
-    // 加载提示
-    let load = `<div class="ai"><div class="a-box">AI正在生成回答...</div></div>`;
-    chatBox.innerHTML += load;
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // 真实AI请求
-    let res = await fetch("https://free.v36.cm/v1/chat/completions",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            model:"gpt-3.5-turbo",
-            messages:[{"role":"user","content":text}],
-            temperature:0.6
-        })
-    });
-
-    let data = await res.json();
-    // 删掉加载
-    chatBox.removeChild(chatBox.lastElementChild);
-    // AI回复
-    let ans = data.choices[0].message.content;
-    chatBox.innerHTML += `<div class="ai"><div class="a-box">${ans}</div></div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-</script>
+    <!-- 引入我们的逻辑代码 -->
+    <script src="main.js"></script>
 </body>
 </html>
