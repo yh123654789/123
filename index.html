@@ -1,294 +1,533 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI智能助手 - 杨泓</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: system-ui;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
+
         .container {
-            background: white;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 32px;
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
         }
+
+        /* 头部区域 - 显示学号姓名 */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            color: white;
+            padding: 24px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
-        .student-info {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .settings {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .setting {
+
+        .logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
         }
-        .setting label {
+
+        .logo span {
+            font-size: 32px;
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .student-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .student-id {
             font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 2px;
+        }
+
+        /* 参数控制面板 */
+        .control-panel {
+            background: #f8fafc;
+            padding: 20px 32px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+ gap: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .control-group input[type="range"] {
+            width: 180px;
+            height: 4px;
+            border-radius: 5px;
+            background: #cbd5e1;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]:focus {
+            outline: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-group select {
+            padding: 8px 16px;
+            border-radius: 24px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .value-display {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 500;
+            color: #667eea;
+            border: 1px solid #cbd5e1;
+            min-width: 50px;
+            text-align: center;
         }
-        .setting input, .setting select {
-            padding: 5px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-        .chat-area {
-            height: 400px;
+
+        /* 聊天区域 */
+        .chat-container {
+            height: 450px;
             overflow-y: auto;
-            padding: 20px;
+            padding: 24px 32px;
             background: #ffffff;
         }
+
         .message {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .message.user {
             flex-direction: row-reverse;
         }
-        .message .content {
-            max-width: 70%;
-            padding: 10px 16px;
-            border-radius: 18px;
-            line-height: 1.5;
-            word-break: break-word;
-        }
-        .message.user .content {
-            background: #667eea;
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-        .message.assistant .content {
-            background: #f0f0f0;
-            color: #333;
-            border-bottom-left-radius: 5px;
-        }
+
         .avatar {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 20px;
+            flex-shrink: 0;
         }
+
+        .message.user .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.assistant .avatar {
+            background: #e2e8f0;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.assistant .bubble {
+            background: #f1f5f9;
+            color: #1e293b;
+            border-bottom-left-radius: 6px;
+        }
+
+        /* 输入区域 */
         .input-area {
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 20px 32px 32px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
             display: flex;
-            gap: 10px;
-            border-top: 1px solid #e0e0e0;
+            gap: 12px;
         }
+
         .input-area input {
             flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 40px;
             font-size: 15px;
             outline: none;
+            transition: all 0.3s;
         }
+
         .input-area input:focus {
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
         .input-area button {
-            padding: 12px 24px;
+            padding: 14px 32px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
+            border-radius: 40px;
             font-size: 15px;
-            font-weight: 500;
-            transition: transform 0.2s;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .input-area button:hover {
-            transform: scale(1.02);
+
+        .input-area button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
         }
+
         .input-area button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        .temp-value {
-            min-width: 35px;
+
+        /* 滚动条 */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        /* 欢迎消息 */
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- 头部：学号+姓名 -->
+    <!-- 头部：显示姓名和学号 -->
     <div class="header">
-        <div>🤖 AI 智能助手</div>
-        <div class="student-info">📚 杨泓 | 学号 423240639</div>
+        <div class="logo">
+            <span>🤖</span>
+            AI 智能助手
+        </div>
+        <div class="student-card">
+            <div class="student-name">杨泓</div>
+            <div class="student-id">学号：423240639</div>
+        </div>
     </div>
 
     <!-- 参数调节面板 -->
-    <div class="settings">
-        <div class="setting">
-            <label>🌡️ 温度:</label>
-            <input type="range" id="temperature" min="0" max="1.5" step="0.1" value="0.7">
-            <span class="temp-value" id="tempValue">0.7</span>
+    <div class="control-panel">
+        <div class="control-group">
+            <label>🌡️ 温度参数</label>
+            <input type="range" id="temperature" min="0" max="1.5" step="0.1" value="0.8">
+            <span class="value-display" id="tempValue">0.8</span>
         </div>
-        <div class="setting">
-            <label>🤖 模型:</label>
-            <select id="model">
+        <div class="control-group">
+            <label>🎯 模型选择</label>
+            <select id="modelSelect">
                 <option value="deepseek-chat">DeepSeek-V3 (推荐)</option>
                 <option value="deepseek-reasoner">DeepSeek-R1 (深度推理)</option>
             </select>
         </div>
-        <div class="setting">
-            <label>📏 最大长度:</label>
-            <input type="number" id="maxTokens" value="2000" step="100" min="100" max="4000">
+        <div class="control-group">
+            <label>📏 最大回复长度</label>
+            <input type="range" id="maxTokens" min="500" max="4000" step="100" value="2000">
+            <span class="value-display" id="tokensValue">2000</span>
         </div>
     </div>
 
     <!-- 聊天区域 -->
-    <div class="chat-area" id="chatArea">
+    <div class="chat-container" id="chatContainer">
         <div class="message assistant">
             <div class="avatar">🤖</div>
-            <div class="content">你好！我是AI助手，有什么可以帮你的吗？</div>
+            <div class="bubble">
+                你好！我是杨泓同学开发的 AI 智能助手 🎉<br>
+                基于 DeepSeek 大模型，支持参数调节和深度对话。<br>
+                有什么我可以帮你的吗？
+            </div>
         </div>
     </div>
 
     <!-- 输入区域 -->
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="输入你的问题..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <button id="sendBtn" onclick="sendMessage()">发送 ✨</button>
+        <input type="text" id="messageInput" placeholder="输入你的问题..." onkeypress="handleKeyPress(event)">
+        <button id="sendBtn" onclick="sendMessage()">发送消息 ✨</button>
     </div>
 </div>
 
 <script>
-    // ============= API配置（已填入你的密钥） =============
-    const USE_MOCK = true;  // 真实AI模式
-    const API_KEY = "sk-dd92d2fc2b24497cb2d20e045cdee93d";  // 你的密钥已填好
-    // ==================================================
+    // ==================== AI 配置 ====================
+    // 你的 DeepSeek API Key（已配置）
+    const DEEPSEEK_API_KEY = "sk-f6889de459444e68abfd3cd05437f81b";
+    const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
     
-    const API_URL = "https://api.deepseek.com/v1/chat/completions";
-    
-    // DOM元素
-    const chatArea = document.getElementById('chatArea');
-    const userInput = document.getElementById('userInput');
+    // 是否使用真实 AI（true=真实AI，false=演示模式）
+    const USE_REAL_AI = true;
+    // =================================================
+
+    // DOM 元素
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
     const temperatureSlider = document.getElementById('temperature');
     const tempValue = document.getElementById('tempValue');
-    const modelSelect = document.getElementById('model');
-    const maxTokensInput = document.getElementById('maxTokens');
+    const modelSelect = document.getElementById('modelSelect');
+    const maxTokensSlider = document.getElementById('maxTokens');
+    const tokensValue = document.getElementById('tokensValue');
+
+    // 显示参数值
+    temperatureSlider.addEventListener('input', () => {
+        tempValue.textContent = temperatureSlider.value;
+    });
     
-    temperatureSlider.oninput = () => tempValue.textContent = temperatureSlider.value;
-    
-    let messages = [{ role: "system", content: "你是一个专业、友好的AI助手。" }];
-    
+    maxTokensSlider.addEventListener('input', () => {
+        tokensValue.textContent = maxTokensSlider.value;
+    });
+
+    // 消息历史（保持对话上下文）
+    let conversationHistory = [
+        {
+            role: "system",
+            content: "你是一个专业、友好、有帮助的 AI 助手。你的回答要简洁、准确、有条理。"
+        }
+    ];
+
+    // 转义 HTML 防止 XSS
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
+    // 添加消息到界面
     function addMessage(content, role) {
-        const div = document.createElement('div');
-        div.className = `message ${role}`;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        
         const avatar = role === 'user' ? '👤' : '🤖';
-        div.innerHTML = `
+        const bubbleClass = role === 'user' ? 'bubble' : 'bubble';
+        
+        messageDiv.innerHTML = `
             <div class="avatar">${avatar}</div>
-            <div class="content">${escapeHtml(content)}</div>
+            <div class="${bubbleClass}">${escapeHtml(content)}</div>
         `;
-        chatArea.appendChild(div);
-        chatArea.scrollTop = chatArea.scrollHeight;
-        messages.push({ role: role, content: content });
+        
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // 保存到对话历史
+        conversationHistory.push({
+            role: role === 'user' ? 'user' : 'assistant',
+            content: content
+        });
     }
-    
+
+    // 显示加载状态
     function setLoading(isLoading) {
         sendBtn.disabled = isLoading;
-        sendBtn.textContent = isLoading ? '🤔 AI思考中...' : '发送 ✨';
-        userInput.disabled = isLoading;
+        sendBtn.textContent = isLoading ? '🤔 AI 思考中...' : '发送消息 ✨';
+        messageInput.disabled = isLoading;
     }
-    
-    // 真实DeepSeek API调用
-    async function realDeepSeekAPI(userMessage) {
-        const requestData = {
+
+    // 显示加载动画（思考中）
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message assistant';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="avatar">🤖</div>
+            <div class="bubble" style="background: #f1f5f9;">
+                <span>正在思考</span>
+                <span style="animation: blink 1.4s infinite">.</span>
+                <span style="animation: blink 1.4s infinite 0.2s">.</span>
+                <span style="animation: blink 1.4s infinite 0.4s">.</span>
+            </div>
+        `;
+        chatContainer.appendChild(typingDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    // 调用 DeepSeek API
+    async function callDeepSeekAPI(userMessage) {
+        const requestBody = {
             model: modelSelect.value,
-            messages: messages,
+            messages: conversationHistory,
             temperature: parseFloat(temperatureSlider.value),
-            max_tokens: parseInt(maxTokensInput.value),
+            max_tokens: parseInt(maxTokensSlider.value),
             stream: false
         };
-        
-        const response = await fetch(API_URL, {
+
+        const response = await fetch(DEEPSEEK_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
             },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify(requestBody)
         });
-        
+
         if (!response.ok) {
-            const errorText = await response.text();
-            if (response.status === 401) {
-                throw new Error('API密钥无效，请检查是否正确填写');
-            } else if (response.status === 429) {
-                throw new Error('请求太频繁，请稍后再试');
-            } else {
-                throw new Error(`API错误(${response.status}): ${errorText}`);
-            }
+            const error = await response.json();
+            throw new Error(error.error?.message || `API 请求失败: ${response.status}`);
         }
-        
+
         const data = await response.json();
         return data.choices[0].message.content;
     }
-    
+
+    // 发送消息主函数
     async function sendMessage() {
-        const userMsg = userInput.value.trim();
-        if (!userMsg) return;
+        const userMessage = messageInput.value.trim();
+        if (!userMessage) return;
         
-        userInput.value = '';
-        addMessage(userMsg, 'user');
+        // 清空输入框
+        messageInput.value = '';
+        
+        // 添加用户消息到界面
+        addMessage(userMessage, 'user');
+        
+        // 显示加载状态
         setLoading(true);
+        showTypingIndicator();
         
         try {
-            const reply = await realDeepSeekAPI(userMsg);
-            addMessage(reply, 'assistant');
+            let aiResponse;
+            
+            if (USE_REAL_AI) {
+                // 调用真实 DeepSeek API
+                aiResponse = await callDeepSeekAPI(userMessage);
+            } else {
+                // 演示模式（模拟回复）
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                const demoReplies = [
+                    "这是演示模式。请在代码中将 USE_REAL_AI 改为 true 并使用有效的 API Key 来获得真实 AI 回复。",
+                    "你好！我是杨泓的 AI 助手项目。当前是演示模式，配置真实 API Key 后即可使用完整功能。",
+                    "感谢你的提问！要获得更智能的回复，请配置 DeepSeek API Key。"
+                ];
+                aiResponse = demoReplies[Math.floor(Math.random() * demoReplies.length)];
+            }
+            
+            removeTypingIndicator();
+            addMessage(aiResponse, 'assistant');
+            
         } catch (error) {
-            console.error('错误:', error);
-            addMessage(`❌ 出错了：${error.message}`, 'assistant');
+            console.error('错误详情:', error);
+            removeTypingIndicator();
+            addMessage(`❌ 出错了：${error.message}。请检查 API Key 是否正确或网络是否正常。`, 'assistant');
         } finally {
             setLoading(false);
         }
     }
-    
-    window.sendMessage = sendMessage;
-    
-    console.log('AI助手已启动 - 开发者：杨泓 423240639');
-    console.log('当前：真实DeepSeek AI模式');
+
+    // 回车发送
+    function handleKeyPress(event) {
+        if (event.key === 'Enter' && !sendBtn.disabled) {
+            sendMessage();
+        }
+    }
+
+    // 控制台输出项目信息
+    console.log('%c🚀 AI 智能助手已启动', 'color: #667eea; font-size: 16px; font-weight: bold;');
+    console.log('%c开发者：杨泓', 'color: #764ba2; font-size: 14px;');
+    console.log('%c学号：423240639', 'color: #764ba2; font-size: 14px;');
+    console.log('%cAI 模型：DeepSeek', 'color: #10b981; font-size: 14px;');
+
+    // 添加 CSS 动画
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
