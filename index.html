@@ -1,1 +1,361 @@
-<div class="student-info">杨泓 | 423240639</div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能助手 - 杨泓</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+        }
+        /* 头部：学号姓名 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .student-info {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .student-info span {
+            font-weight: bold;
+        }
+        /* 参数调节面板 */
+        .settings {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .setting-item label {
+            font-weight: 500;
+            color: #333;
+        }
+        .setting-item input {
+            width: 100px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .setting-item select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        /* 聊天区域 */
+        .chat-area {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: white;
+        }
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message .content {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+        }
+        .message.user .content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .message.assistant .content {
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        /* 输入区域 */
+        .input-area {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+        }
+        .input-area input:focus {
+            border-color: #667eea;
+        }
+        .input-area button {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .input-area button:hover {
+            transform: scale(1.02);
+        }
+        .input-area button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 头部：显示学号和姓名 -->
+    <div class="header">
+        <div class="title">🤖 AI 智能助手</div>
+        <div class="student-info">
+            📚 杨泓 | 学号 423240639
+        </div>
+    </div>
+
+    <!-- 参数调节面板 -->
+    <div class="settings">
+        <div class="setting-item">
+            <label>🌡️ 温度:</label>
+            <input type="range" id="temperature" min="0" max="1.5" step="0.1" value="0.7">
+            <span id="tempValue">0.7</span>
+        </div>
+        <div class="setting-item">
+            <label>🤖 模型:</label>
+            <select id="model">
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                <option value="gpt-4">GPT-4</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label>📏 最大长度:</label>
+            <input type="number" id="maxTokens" value="1000" step="100" min="100" max="4000">
+        </div>
+    </div>
+
+    <!-- 聊天区域 -->
+    <div class="chat-area" id="chatArea">
+        <div class="message assistant">
+            <div class="avatar">🤖</div>
+            <div class="content">你好！我是AI助手，有什么可以帮你的吗？</div>
+        </div>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="输入你的问题..." onkeypress="handleKeyPress(event)">
+        <button id="sendBtn" onclick="sendMessage()">发送 ✨</button>
+    </div>
+</div>
+
+<script>
+    // ========== 配置 ==========
+    // 免费API（无需密钥，直接可用）
+    // 使用 OpenRouter 免费代理或本地 mock（演示用）
+    // 如需真实AI效果，替换成你的API KEY
+    
+    // 演示模式：模拟AI回复（无需配置任何key）
+    // 如需真实OpenAI，将 USE_MOCK 改为 false 并填入 API_KEY
+    const USE_MOCK = true;  // true=模拟回复（无需配置），false=真实API
+    const API_KEY = "";     // 如果 USE_MOCK=false，填入你的 OpenAI API Key
+    const API_URL = "https://api.openai.com/v1/chat/completions";
+    
+    // DOM 元素
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const temperatureSlider = document.getElementById('temperature');
+    const tempValue = document.getElementById('tempValue');
+    const modelSelect = document.getElementById('model');
+    const maxTokensInput = document.getElementById('maxTokens');
+    
+    // 温度滑块显示
+    temperatureSlider.addEventListener('input', function() {
+        tempValue.textContent = this.value;
+    });
+    
+    // 消息历史
+    let messages = [
+        { role: "system", content: "你是一个 helpful 的AI助手。" }
+    ];
+    
+    // 添加消息到界面
+    function addMessage(content, role) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        const avatar = role === 'user' ? '👤' : '🤖';
+        messageDiv.innerHTML = `
+            <div class="avatar">${avatar}</div>
+            <div class="content">${escapeHtml(content)}</div>
+        `;
+        chatArea.appendChild(messageDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        
+        // 保存到历史
+        messages.push({ role: role, content: content });
+    }
+    
+    // 转义HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // 显示加载状态
+    function setLoading(isLoading) {
+        sendBtn.disabled = isLoading;
+        sendBtn.textContent = isLoading ? '思考中...' : '发送 ✨';
+        userInput.disabled = isLoading;
+    }
+    
+    // 模拟AI回复（无需API key）
+    async function mockAIResponse(userMessage) {
+        const mockReplies = [
+            "你好！我是杨泓同学开发的AI助手，很高兴为你服务！",
+            "这是一个很专业的问题，我来帮你分析一下...",
+            "基于当前技术趋势，我建议可以这样做。",
+            "感谢提问！这个问题涉及到AI领域的核心概念。",
+            "根据我的理解，你的想法很有创意，可以进一步实现。"
+        ];
+        // 模拟延迟
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return mockReplies[Math.floor(Math.random() * mockReplies.length)] + " （演示模式）";
+    }
+    
+    // 真实API调用（需要API Key）
+    async function realAPIResponse(userMessage) {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: modelSelect.value,
+                messages: messages,
+                temperature: parseFloat(temperatureSlider.value),
+                max_tokens: parseInt(maxTokensInput.value)
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API错误: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+    }
+    
+    // 发送消息主函数
+    async function sendMessage() {
+        const userMsg = userInput.value.trim();
+        if (!userMsg) return;
+        
+        // 清空输入框
+        userInput.value = '';
+        
+        // 添加用户消息
+        addMessage(userMsg, 'user');
+        
+        // 显示加载状态
+        setLoading(true);
+        
+        try {
+            let assistantReply;
+            if (USE_MOCK) {
+                assistantReply = await mockAIResponse(userMsg);
+            } else {
+                assistantReply = await realAPIResponse(userMsg);
+            }
+            addMessage(assistantReply, 'assistant');
+        } catch (error) {
+            console.error('错误:', error);
+            addMessage('抱歉，出错了：' + error.message, 'assistant');
+        } finally {
+            setLoading(false);
+        }
+    }
+    
+    // 回车发送
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    // 欢迎消息
+    console.log('AI助手已启动 - 开发者：杨泓 423240639');
+</script>
+</body>
+</html>
